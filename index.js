@@ -97,7 +97,7 @@ async function run() {
 
     // user related api 
 
-    app.get('/users', verifyToken,verifyAdmin, async (req, res) => {
+    app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
 
       const result = await userCollection.find().toArray()
       res.send(result)
@@ -133,7 +133,7 @@ async function run() {
     })
 
     // Admin Api  
-    app.patch('/users/admin/:id',verifyToken,verifyAdmin, async (req, res) => {
+    app.patch('/users/admin/:id', verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id
       const filter = { _id: new ObjectId(id) }
       const updatedInfo = {
@@ -146,7 +146,7 @@ async function run() {
     })
 
 
-    app.delete('/users/:id',verifyToken,verifyAdmin, async (req, res) => {
+    app.delete('/users/:id', verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
       const result = await userCollection.deleteOne(query)
@@ -171,6 +171,14 @@ async function run() {
       const result = await campingCollection.find().toArray()
       res.send(result)
     })
+
+    app.get('/campings/user', async (req, res) => {
+      const email = req.query.email
+      const query = { email: email }
+      const result = await campingCollection.find(query).toArray()
+      res.send(result)
+    })
+
     app.get('/campings/:id', async (req, res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
@@ -181,11 +189,35 @@ async function run() {
       const item = req.body
       const result = await campingCollection.insertOne(item);
       res.send(result)
-  })
+    })
+    app.put('/campings/:id', async (req, res) => {
+      const item = req.body
+      const id = req.params.id
+      const filter = { _id: new ObjectId(id) }
+      const updateCamping = {
+        $set: {
+          name: item.name,
+          category: item.category,
+          age: item.age,
+          short: item.short,
+          long: item.long,
+          image: item.image,
+          status: item.status,
+
+        }
+      }
+      const result = await campingCollection.updateOne(filter, updateCamping)
+      res.send(result)
+    })
+
 
     // pets data collection
-
     app.get('/pets', async (req, res) => {
+      const result = await petCollection.find().toArray()
+      res.send(result)
+    })
+
+    app.get('/pets/user', async (req, res) => {
       const email = req.query.email
       const query = { email: email }
       const result = await petCollection.find(query).toArray()
@@ -198,54 +230,11 @@ async function run() {
       res.send(result)
     })
 
-    app.delete('/pets/:id', async (req, res) => {
-      const id = req.params.id
-      const query = { _id: new ObjectId(id) }
-      const result = await petCollection.deleteOne(query)
-      res.send(result)
-    })
-
-    //  add pet api  
-
-    app.get('/pet/:id', async (req, res) => {
-      const id = req.params.id
-      const query = { _id: new ObjectId(id) }
-      const result = await addPetCollection.findOne(query)
-      res.send(result)
-    })
-
-    app.post('/pet', async (req, res) => {
+    app.patch('/pets/:id', async (req, res) => {
       const item = req.body
-      const result = await addPetCollection.insertOne(item);
-      res.send(result)
-  })
-     
-
-  app.get('/pet', async (req, res) => {
-    const result = await addPetCollection.find().toArray()
-    res.send(result)
-  })
-
-  app.get('/pet', async (req, res) => {
-    const email = req.query.email
-    const query = { email: email }
-    const result = await addPetCollection.find(query).toArray()
-    res.send(result)
-  })
-
-  
-  app.delete('/pet/:id', async (req, res) => {
-    const id = req.params.id
-    const query = { _id: new ObjectId(id) }
-    const result = await addPetCollection.deleteOne(query)
-    res.send(result)
-  })
-
-  app.patch('/pet/:id', async (req, res) => {
-    const item = req.body
-    const id = req.params.id
-    const filter = { _id: new ObjectId(id) }
-    const updatePet = {
+      const id = req.params.id
+      const filter = { _id: new ObjectId(id) }
+      const updatePet = {
         $set: {
           name: item.name,
           category: item.category,
@@ -255,10 +244,55 @@ async function run() {
           image: item.image,
 
         }
-    }
-    const result = await addPetCollection.updateOne(filter, updatePet)
-    res.send(result)
-})
+      }
+      const result = await addPetCollection.updateOne(filter, updatePet)
+      res.send(result)
+    })
+
+
+    app.delete('/pets/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await petCollection.deleteOne(query)
+      res.send(result)
+    })
+
+    //  add pet api  
+
+    // app.get('/pet/:id', async (req, res) => {
+    //   const id = req.params.id
+    //   const query = { _id: new ObjectId(id) }
+    //   const result = await addPetCollection.findOne(query)
+    //   res.send(result)
+    // })
+
+    // app.post('/pet', async (req, res) => {
+    //   const item = req.body
+    //   const result = await addPetCollection.insertOne(item);
+    //   res.send(result)
+    // })
+
+
+    // app.get('/pet', async (req, res) => {
+    //   const result = await addPetCollection.find().toArray()
+    //   res.send(result)
+    // })
+
+    // app.get('/pet', async (req, res) => {
+    //   const email = req.query.email
+    //   const query = { email: email }
+    //   const result = await addPetCollection.find(query).toArray()
+    //   res.send(result)
+    // })
+
+
+    app.delete('/pet/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await addPetCollection.deleteOne(query)
+      res.send(result)
+    })
+
 
 
     // await client.db("admin").command({ ping: 1 });
